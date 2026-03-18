@@ -18,9 +18,10 @@ This project is configured to deploy frontend and backend API on a single Netlif
 
 If prompted manually, use:
 
-- Build command: `npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend`
+- Build command: `npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend`
 - Publish directory: `frontend/build`
 - Functions directory: `netlify/functions`
+- Node version: `24`
 
 ## 3. Environment Variables (Required)
 
