@@ -5,6 +5,7 @@ import { useAuth } from '../App';
 import Navbar from '../components/Navbar';
 import QuickAssessment from '../components/QuickAssessment';
 import Diagnostic from '../components/Diagnostic';
+import { API_SERVER_URL } from '../config/api';
 import { 
   getPerformance, 
   shouldShowChallenge, 
@@ -869,7 +870,7 @@ Computer Hardware Servicing (CHS) is the procedural workflow of installing, repa
                         const timestamp = new Date().getTime();
                         const buildImgUrl = (url) => {
                           if (!url) return '';
-                          if (url.startsWith('/uploads')) return `http://localhost:5000${url}?t=${timestamp}`;
+                          if (url.startsWith('/uploads')) return `${API_SERVER_URL}${url}?t=${timestamp}`;
                           return url;
                         };
                         const layout = section.layout || 'single';
@@ -994,7 +995,7 @@ Computer Hardware Servicing (CHS) is the procedural workflow of installing, repa
                         // Build proper video URL with cache busting
                         const videoTimestamp = new Date().getTime();
                         const videoUrl = section.content?.startsWith('/uploads') 
-                          ? `http://localhost:5000${section.content}?t=${videoTimestamp}`
+                          ? `${API_SERVER_URL}${section.content}?t=${videoTimestamp}`
                           : section.content;
                         // Check if it's a YouTube/embed URL or a local video file
                         const isEmbedUrl = videoUrl?.includes('youtube') || videoUrl?.includes('vimeo') || videoUrl?.includes('embed');

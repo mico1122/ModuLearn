@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../App';
 import Navbar from '../components/Navbar';
+import { API_BASE_URL } from '../config/api';
 
 const SimulationActivity = () => {
   const { id } = useParams();
@@ -69,7 +70,7 @@ const SimulationActivity = () => {
         if (zoneData.backgroundImage) {
           // Convert server path to full URL
           if (zoneData.backgroundImage.startsWith('/uploads')) {
-            const apiBaseUrl = axios.defaults.baseURL || 'http://localhost:5000/api';
+            const apiBaseUrl = axios.defaults.baseURL || API_BASE_URL;
             const baseUrl = apiBaseUrl.replace('/api', '');
             const fullUrl = `${baseUrl}${zoneData.backgroundImage}`;
             setBackgroundImage(fullUrl);
@@ -95,7 +96,7 @@ const SimulationActivity = () => {
             // Convert server path to full URL if small image exists
             if (z.smallImage) {
               if (z.smallImage.startsWith('/uploads')) {
-                const apiBaseUrl = axios.defaults.baseURL || 'http://localhost:5000/api';
+                const apiBaseUrl = axios.defaults.baseURL || API_BASE_URL;
                 const baseUrl = apiBaseUrl.replace('/api', '');
                 smallImageUrl = `${baseUrl}${z.smallImage}`;
               } else {

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import AdminNavbar from '../components/AdminNavbar';
 import ImageCropper from '../components/ImageCropper';
+import { API_BASE_URL } from '../config/api';
 
 const AddSimulation = () => {
   const { user } = useAuth();
@@ -70,7 +71,7 @@ const AddSimulation = () => {
           if (zoneData.backgroundImage) {
             // Convert server path to full URL for display
             if (zoneData.backgroundImage.startsWith('/uploads')) {
-              const apiBaseUrl = axios.defaults.baseURL || 'http://localhost:5000/api';
+              const apiBaseUrl = axios.defaults.baseURL || API_BASE_URL;
               const baseUrl = apiBaseUrl.replace('/api', '');
               const timestamp = new Date().getTime(); // Cache busting
               const fullUrl = `${baseUrl}${zoneData.backgroundImage}?t=${timestamp}`;
@@ -88,7 +89,7 @@ const AddSimulation = () => {
               // Restore small image if exists
               if (zone.smallImage) {
                 if (zone.smallImage.startsWith('/uploads')) {
-                  const apiBaseUrl = axios.defaults.baseURL || 'http://localhost:5000/api';
+                  const apiBaseUrl = axios.defaults.baseURL || API_BASE_URL;
                   const baseUrl = apiBaseUrl.replace('/api', '');
                   const timestamp = new Date().getTime();
                   const fullUrl = `${baseUrl}${zone.smallImage}?t=${timestamp}`;

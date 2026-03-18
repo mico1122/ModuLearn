@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../App';
 import AdminNavbar from '../components/AdminNavbar';
+import { API_BASE_URL } from '../config/api';
 
 const AddLesson = () => {
   const { user } = useAuth();
@@ -229,7 +230,7 @@ const AddLesson = () => {
       if (response.data.sections) {
         console.log('Setting sections:', response.data.sections);
 
-        const apiBaseUrl = axios.defaults.baseURL || 'http://localhost:5000/api';
+        const apiBaseUrl = axios.defaults.baseURL || API_BASE_URL;
         const baseUrl = apiBaseUrl.replace('/api', '');
         const timestamp = new Date().getTime();
 

@@ -8,6 +8,7 @@ import Notification from '../components/Notification';
 import Avatar from '../components/Avatar';
 import ImageCropper from '../components/ImageCropper';
 import { applyAppearanceSettings, getStoredAppearanceSettings, saveAppearanceSettings } from '../utils/appearanceSettings';
+import { API_SERVER_URL } from '../config/api';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -243,8 +244,7 @@ const Profile = () => {
   };
 
   const handleEditCurrentAvatar = () => {
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const serverUrl = apiBaseUrl.replace('/api', '');
+    const serverUrl = API_SERVER_URL;
     
     let imageUrl;
     

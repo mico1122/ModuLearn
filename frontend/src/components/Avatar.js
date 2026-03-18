@@ -1,4 +1,5 @@
 import React from 'react';
+import { API_SERVER_URL } from '../config/api';
 
 const Avatar = ({ user, size = 'md', className = '' }) => {
   // Size configurations
@@ -23,8 +24,7 @@ const Avatar = ({ user, size = 'md', className = '' }) => {
     if (!user) return null;
     
     // Get the API base URL (without /api path)
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const serverUrl = apiBaseUrl.replace('/api', '');
+    const serverUrl = API_SERVER_URL;
     
     // Debug logging
     console.log('Avatar Debug:', {

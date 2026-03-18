@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import axios from 'axios';
 import { ProfileProvider } from './contexts/ProfileContext';
 import { applyAppearanceSettings, getStoredAppearanceSettings } from './utils/appearanceSettings';
+import { API_BASE_URL } from './config/api';
 
 // Pages
 import Landing from './pages/Landing';
@@ -30,7 +31,7 @@ import AdminSettings from './pages/AdminSettings';
 export const AuthContext = createContext();
 
 // Axios configuration
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+axios.defaults.baseURL = API_BASE_URL;
 
 // Auth Provider
 export const AuthProvider = ({ children }) => {
