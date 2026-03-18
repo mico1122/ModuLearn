@@ -5,7 +5,23 @@ const { query } = require('../config/database');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
+
+let sharpLib = null;
+const getSharp = () => {
+  if (sharpLib !== null) {
+    return sharpLib;
+  }
+
+  try {
+    // Lazy-load sharp so API can still boot in runtimes where native binaries differ.
+    sharpLib = require('sharp');
+  } catch (error) {
+    console.warn('sharp is not available, image resize will be skipped:', error.message);
+    sharpLib = false;
+  }
+
+  return sharpLib;
+};
 
 // Get user profile
 const getUserProfile = async (req, res) => {
@@ -337,23 +353,31 @@ const uploadProfilePicture = async (req, res) => {
 
     const oldPicture = users[0]?.profile_picture;
 
-    // Resize image to 600x600px
-    const resizedFilename = `${userId}_${Date.now()}.jpg`;
-    const resizedPath = path.join(__dirname, '../uploads/profiles', resizedFilename);
-    
-    await sharp(req.file.path)
-      .resize(600, 600, {
-        fit: 'cover',
-        position: 'center'
-      })
-      .jpeg({ quality: 90 })
-      .toFile(resizedPath);
-    
-    // Delete the original uploaded file
-    fs.unlinkSync(req.file.path);
+    let profilePicturePath = '';
+    const sharp = getSharp();
+
+    if (sharp) {
+      // Resize image to 600x600px when sharp is available.
+      const resizedFilename = `${userId}_${Date.now()}.jpg`;
+      const resizedPath = path.join(__dirname, '../uploads/profiles', resizedFilename);
+
+      await sharp(req.file.path)
+        .resize(600, 600, {
+          fit: 'cover',
+          position: 'center'
+        })
+        .jpeg({ quality: 90 })
+        .toFile(resizedPath);
+
+      // Delete the original uploaded file after resize.
+      fs.unlinkSync(req.file.path);
+      profilePicturePath = `/uploads/profiles/${resizedFilename}`;
+    } else {
+      // Fallback: keep original upload so avatar feature still works.
+      profilePicturePath = `/uploads/profiles/${path.basename(req.file.path)}`;
+    }
 
     // Update database with new profile picture path and set avatar_type to 'custom'
-    const profilePicturePath = `/uploads/profiles/${resizedFilename}`;
     
     await query(
       'UPDATE user SET profile_picture = ?, avatar_type = ? WHERE UserID = ?',

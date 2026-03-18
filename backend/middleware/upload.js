@@ -3,16 +3,33 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../uploads/profiles');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+const isServerlessRuntime = process.env.NETLIFY === 'true' || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadsRoot = isServerlessRuntime
+  ? path.join('/tmp', 'modulearn', 'uploads', 'profiles')
+  : path.join(__dirname, '../uploads/profiles');
+
+// Ensure uploads directory exists without crashing startup.
+const ensureUploadsDir = () => {
+  try {
+    if (!fs.existsSync(uploadsRoot)) {
+      fs.mkdirSync(uploadsRoot, { recursive: true });
+    }
+    return true;
+  } catch (error) {
+    console.error('Unable to prepare uploads directory:', error.message);
+    return false;
+  }
+};
+
+const uploadsReady = ensureUploadsDir();
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir);
+    if (!uploadsReady && !ensureUploadsDir()) {
+      return cb(new Error('Uploads directory is not writable'));
+    }
+    cb(null, uploadsRoot);
   },
   filename: (req, file, cb) => {
     // Create unique filename: userId_timestamp_originalname

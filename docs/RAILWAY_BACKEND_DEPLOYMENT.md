@@ -61,6 +61,17 @@ Minimum required:
 
 You can execute these using Railway MySQL query editor or external client (MySQL Workbench).
 
+Quick CLI option from this repository:
+
+```powershell
+$env:DB_HOST='<railway-host>'
+$env:DB_PORT='<railway-port>'
+$env:DB_USER='<railway-user>'
+$env:DB_PASSWORD='<railway-password>'
+$env:DB_NAME='<railway-db-name>'
+node backend/bootstrap_remote_db.js
+```
+
 ## 5. Point Netlify Frontend to Railway API
 
 In Netlify site environment variables:
