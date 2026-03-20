@@ -38,8 +38,23 @@ app.use(helmet({
     },
   },
 })); // Security headers
+
+const corsOriginConfig = (process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow non-browser requests and same-origin requests with no Origin header.
+    if (!origin) return callback(null, true);
+
+    if (corsOriginConfig.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('CORS origin not allowed'));
+  },
   credentials: true
 }));
 app.use(compression()); // Compress responses
