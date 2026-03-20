@@ -897,6 +897,46 @@ const AddLesson = () => {
     ));
   };
 
+  const normalizeVideoEmbedUrl = (rawUrl) => {
+    if (!rawUrl) return '';
+    const value = String(rawUrl).trim();
+
+    try {
+      const parsed = new URL(value);
+      const host = parsed.hostname.toLowerCase();
+
+      if (host.includes('youtu.be')) {
+        const videoId = parsed.pathname.replace('/', '').trim();
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      }
+
+      if (host.includes('youtube.com')) {
+        const videoId = parsed.searchParams.get('v');
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      }
+
+      if (host.includes('vimeo.com') && !parsed.pathname.includes('/video/')) {
+        const videoId = parsed.pathname.split('/').filter(Boolean).pop();
+        if (videoId) return `https://player.vimeo.com/video/${videoId}`;
+      }
+
+      return value;
+    } catch {
+      return value;
+    }
+  };
+
+  const isEmbedVideoUrl = (url) => {
+    if (!url) return false;
+    const value = String(url).toLowerCase();
+    return (
+      value.includes('youtube.com') ||
+      value.includes('youtu.be') ||
+      value.includes('vimeo.com') ||
+      value.includes('embed')
+    );
+  };
+
   const handleFileUpload = async (sectionId, event, fileType) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -2834,12 +2874,23 @@ const AddLesson = () => {
                         >
                           {section.content ? (
                             <div className="relative">
-                              <video 
-                                src={section.content} 
-                                controls 
-                                className="max-w-full h-auto mx-auto rounded-lg shadow-md"
-                                draggable="false"
-                              />
+                              {isEmbedVideoUrl(section.content) ? (
+                                <div className="aspect-video max-w-3xl mx-auto">
+                                  <iframe
+                                    src={normalizeVideoEmbedUrl(section.content)}
+                                    className="w-full h-full rounded-lg shadow-md"
+                                    allowFullScreen
+                                    title="Embedded lesson video"
+                                  ></iframe>
+                                </div>
+                              ) : (
+                                <video 
+                                  src={section.content} 
+                                  controls 
+                                  className="max-w-full h-auto mx-auto rounded-lg shadow-md"
+                                  draggable="false"
+                                />
+                              )}
                               <label className="mt-4 inline-block px-6 py-2 bg-[#1e5a8e] hover:bg-[#164570] text-white rounded-lg cursor-pointer transition-all">
                                 Change Video
                                 <input
@@ -2849,6 +2900,19 @@ const AddLesson = () => {
                                   className="hidden"
                                 />
                               </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSections(prev => prev.map(s =>
+                                    s.id === section.id
+                                      ? { ...s, content: '', file: null, fileName: null }
+                                      : s
+                                  ));
+                                }}
+                                className="mt-4 ml-3 inline-block px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all"
+                              >
+                                Clear Video
+                              </button>
                             </div>
                           ) : (
                             <div>
@@ -2868,6 +2932,25 @@ const AddLesson = () => {
                               <p className="text-sm text-gray-400 mt-1">or drag a video file here</p>
                             </div>
                           )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Video Embed URL (YouTube/Vimeo)</label>
+                          <input
+                            type="url"
+                            value={isEmbedVideoUrl(section.content) ? section.content : ''}
+                            onChange={(e) => {
+                              const embedUrl = normalizeVideoEmbedUrl(e.target.value);
+                              setSections(prev => prev.map(s =>
+                                s.id === section.id
+                                  ? { ...s, content: embedUrl, file: null, fileName: null }
+                                  : s
+                              ));
+                            }}
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-[#2BC4B3] focus:outline-none text-gray-700"
+                          />
+                          <p className="text-xs text-gray-500">Paste a YouTube or Vimeo link to embed a hosted video instead of uploading a file.</p>
                         </div>
                         
                         {/* Caption Text Field - Same Width as Video Container */}

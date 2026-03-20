@@ -1034,6 +1034,7 @@ Computer Hardware Servicing (CHS) is the procedural workflow of installing, repa
                         const reviewResult = reviewResults[reviewId];
                         const isPerfectScore = typeof reviewResult?.score === 'number' && reviewResult.score === 100;
                         const isWrongSubmission = !!reviewResult && !isPerfectScore;
+                        const showReviewStatusCard = isCompleted || isWrongSubmission;
                         const cooldownSecondsLeft = isWrongSubmission ? getCooldownSecondsLeft(reviewId) : 0;
                         const isCooldownActive = cooldownSecondsLeft > 0;
                         const hasQuestions = section.questions && section.questions.length > 0;
@@ -1043,7 +1044,7 @@ Computer Hardware Servicing (CHS) is the procedural workflow of installing, repa
                         return (
                           <React.Fragment key={index}>
                             {/* Locked / Completed Card */}
-                            {isCompleted ? (
+                            {showReviewStatusCard ? (
                               <div 
                                 onClick={() => {
                                   if (isCooldownActive) return;
@@ -1229,15 +1230,21 @@ Computer Hardware Servicing (CHS) is the procedural workflow of installing, repa
                                                 ...prev,
                                                 [reviewId]: Date.now() + 20000,
                                               }));
+                                              setCompletedReviews(prev => ({
+                                                ...prev,
+                                                [reviewId]: false,
+                                              }));
                                             } else {
                                               setReviewCooldowns(prev => {
                                                 const next = { ...prev };
                                                 delete next[reviewId];
                                                 return next;
                                               });
+                                              setCompletedReviews(prev => ({
+                                                ...prev,
+                                                [reviewId]: true,
+                                              }));
                                             }
-                                            // Any submitted attempt unlocks the next topic condition.
-                                            setCompletedReviews(prev => ({ ...prev, [reviewId]: true }));
                                             setActiveReview(null);
                                             setReviewScore(null);
                                           }}
