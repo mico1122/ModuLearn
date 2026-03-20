@@ -47,10 +47,11 @@ const getSimulationsByModule = async (req, res) => {
       FROM simulation s
       LEFT JOIN simulation_progress sp ON s.SimulationID = sp.SimulationID 
         AND sp.UserID = ?
+      WHERE s.ModuleID = ?
       ORDER BY s.SimulationOrder
     `;
     
-    const [simulations] = await pool.query(query, [userId || 0]);
+    const [simulations] = await pool.query(query, [userId || 0, moduleId]);
     res.json(simulations);
   } catch (error) {
     console.error('Error fetching simulations:', error);
